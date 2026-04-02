@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiPhone, FiTrash2 } from "react-icons/fi";
 import { api } from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 export type StaffTabType = "admin" | "delivery";
@@ -239,8 +239,11 @@ const StaffCard: React.FC<StaffCardProps> = (props) => {
 
         {/* Details */}
         <div className="flex flex-col gap-2 text-sm text-gray-500">
-          <span>📞 {props.phone}</span>
-          <span>🚚 Vehicle: {props.vehicle}</span>
+
+          <span className="flex items-center gap-2">
+            <FiPhone />
+            {props.phone}
+          </span>
         </div>
 
         {/* Divider */}

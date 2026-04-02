@@ -17,41 +17,15 @@ interface BranchUser {
   lastActive: string | "";
 }
 
-/* ---------------- DELIVERY STAFF DATA ---------------- */
-const deliveryStaffData = [
-  {
-    name: "Mike Driver",
-    status: "Available",
-    phone: "+1 234 567 8910",
-    vehicle: "Bike - KA01AB1234",
-    assigned: 8,
-    completed: 145,
-  },
-  {
-    name: "John Driver",
-    status: "On Duty",
-    phone: "+1 234 567 8911",
-    vehicle: "Van - KA01CD5678",
-    assigned: 12,
-    completed: 289,
-  },
-  {
-    name: "Sarah Driver",
-    status: "Available",
-    phone: "+1 234 567 8912",
-    vehicle: "Bike - KA01EF9012",
-    assigned: 6,
-    completed: 178,
-  },
-  {
-    name: "Tom Driver",
-    status: "Off Duty",
-    phone: "+1 234 567 8913",
-    vehicle: "Van - KA01GH3456",
-    assigned: 0,
-    completed: 234,
-  },
-];
+interface DeliveryStaff {
+  id: string;
+  name: string;
+  phone: string;
+  status: string;
+  assigned: number;
+  completed: number;
+  lastSeen?: string;
+}
 
 const rolesPermissionsData = [
   {
@@ -116,6 +90,7 @@ const StaffManagementSection: React.FC = () => {
     "admin" | "delivery" | "roles"
   >("admin");
   const [adminStaffData, setAdminStaffData] = useState<BranchUser[]>([]);
+  const [deliveryStaffData, setDeliveryStaffData] = useState<DeliveryStaff[]>([]);
   const socketRef = useRef<Socket | null>(null);
 
   const fetchUsers = async () => {
@@ -138,6 +113,30 @@ const StaffManagementSection: React.FC = () => {
     };
   }, []);
 
+  const fetchDeliveryStaff = async () => {
+  try {
+    const res = await api.get("/branch/delivery-staff");
+    setDeliveryStaffData(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+  useEffect(() => {
+  
+    fetchDeliveryStaff();
+  
+  }, []);
+
+  useEffect(() => {
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
+
+    socketRef.current.on("delivery:update", fetchDeliveryStaff);
+
+    return () => {
+      socketRef.current?.off("delivery:update", fetchDeliveryStaff);
+      socketRef.current?.disconnect();
+    };
+  }, []);
 
   return (
     <div className="w-full">
@@ -172,9 +171,8 @@ const StaffManagementSection: React.FC = () => {
                 key={idx}
                 type="delivery"
                 name={staff.name}
-                status={staff.status}
                 phone={staff.phone}
-                vehicle={staff.vehicle}
+                status={staff.status}
                 assigned={staff.assigned}
                 completed={staff.completed}
               />
@@ -183,14 +181,7 @@ const StaffManagementSection: React.FC = () => {
 
         }
 
-        {/* -------- ROLES & PERMISSIONS -------- */}
-        {activeTab === "roles" && (
-          <StaffCard
-            type="roles"
-            name=""
-            permissionsData={rolesPermissionsData}
-          />
-        )}
+        
       </div>
     </div>
   );
