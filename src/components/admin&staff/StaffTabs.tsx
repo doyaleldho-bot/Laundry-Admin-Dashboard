@@ -10,7 +10,6 @@ interface StaffTabsProps {
 const tabs: { label: string; value: Tab }[] = [
   { label: "Admin & Staff", value: "admin" },
   { label: "Delivery Staff", value: "delivery" },
-  { label: "Roles & Permissions", value: "roles" },
 ];
 
 const StaffTabs: React.FC<StaffTabsProps> = ({ activeTab, onChange }) => {
@@ -22,9 +21,10 @@ const StaffTabs: React.FC<StaffTabsProps> = ({ activeTab, onChange }) => {
         return (
           <button
             key={tab.value}
+  
             onClick={() => onChange(tab.value)}
             className={`
-              w-[364.34px] h-[35.99px]
+              w-[700px] h-[35.99px]
               rounded-[14px]
               border-[1.25px]
               text-sm font-semibold

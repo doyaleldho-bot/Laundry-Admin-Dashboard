@@ -16,7 +16,7 @@ useEffect(() => {
 
   fetchCounts(); // Initial load
 
-  socketRef.current = io("http://localhost:5001");
+  socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
 
   socketRef.current.on("branch:update", () => {
     fetchCounts(); // Re-fetch when new user created

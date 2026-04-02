@@ -22,11 +22,11 @@ const initialState: AuthState = {
 // Async thunk for login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (payload: { email: string; password: string }, { rejectWithValue }) => {
+  async (payload: { email: string; password: string, latitude: number, longitude: number ,country:string,city:string}, { rejectWithValue }) => {
     try {
            const res = await api.post("/admin/login", payload); 
          toast.success(res.data.message); 
-         localStorage.setItem("isLoggedIn", "true");
+         localStorage.setItem("adm", "true");
            return { email: payload.email, success: true };
     } catch (err: any) {
               toast.error(err.response?.data?.message || "Login failed");

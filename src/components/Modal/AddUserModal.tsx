@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { getProfile } from "../../services/api/profileService";
-import { PasswordGenerator } from "../../utils/passwordGenerator";
+import { PasswordGenerator } from "../../utils/PasswordGenerator";
 import { api } from "../../api/axiosInstance";
 
 

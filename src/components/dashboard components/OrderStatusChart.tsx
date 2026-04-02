@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback,} from "react";
 import {  PieChart, Pie, Cell,  ResponsiveContainer,} from "recharts";
-import axios from "axios";
 import { io, Socket } from "socket.io-client";
+import { api } from "../../api/axiosInstance";
 
 /*  TYPES  */
 export interface OrderStatusData {
@@ -19,8 +19,7 @@ const OrderStatusChart: React.FC = () => {
   /*  FETCH FUNCTION */
   const fetchOrderStatus = useCallback(async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5001/api/dashboard/order-status",
+      const res = await api.get('dashboard/order-status',
         { withCredentials: true }
       );
       setData(res.data);
@@ -40,7 +39,7 @@ const OrderStatusChart: React.FC = () => {
   /*REAL-TIME SOCKET  */
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5001");
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
 
     socketRef.current.on(
       "dashboard:update",

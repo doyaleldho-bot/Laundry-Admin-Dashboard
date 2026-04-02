@@ -15,6 +15,7 @@ import CustomerOrdersPage from "./pages/Customer/CustomerOrdersPage";
 import Customers from "./pages/Customer/Customers";
 import Settings from "./pages/settingspage/Settings";
 import SupportAndHelp from "./pages/Supportpage/SupportAndHelp";
+import TimeSlot from "./pages/TimeSlot/TimeSlot";
 
 function App() {
   return (

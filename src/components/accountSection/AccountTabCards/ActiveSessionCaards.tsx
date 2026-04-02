@@ -72,7 +72,7 @@ fetchSessions();
   }, []);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5001");
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
     // Listen for dashboard updates
     const handleUpdate = () => fetchSessions();
     socketRef.current.on("session:update", handleUpdate);

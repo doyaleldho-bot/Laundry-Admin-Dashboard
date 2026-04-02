@@ -3,10 +3,6 @@ import PickupHeader from '../../components/pickup&delivery/PicupHeader'
 import { useDashboardViewModel } from '../Dashboard/DashboardViewModel';
 import ErrorState from '../../components/ErrorState';
 import { useState } from 'react';
-
-
-
-
 import pickup from "../../assets/picup&delivery/pickups.svg"
 import delivery from "../../assets/picup&delivery/delivery.svg"
 import transit from "../../assets/picup&delivery/transit.svg"
@@ -14,11 +10,12 @@ import comp from "../../assets/picup&delivery/Completed.svg"
 
 import ScheduleTabs from '../../components/pickup&delivery/ScheduleTabs';
 import PickupCard from '../../components/pickup&delivery/PickupCard';
+import TimeSlotDashboard from '../TimeSlot/TimeSlot';
 
 
 const PicupAndDelivery = () => {
      const { data, error } = useDashboardViewModel();
-       const [activeTab, setActiveTab] = useState<"pickup" | "delivery">("pickup");
+       const [activeTab, setActiveTab] = useState<"pickup" | "delivery"|"timeslot">("pickup");
 
   
 
@@ -104,31 +101,36 @@ const deliveryList = [
       </div>
 
       {/* CONTENT */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-  {activeTab === "pickup" ? "Today's Pickups" : "Today's Deliveries"}
-</h2>
+     <div className="bg-white rounded-xl border border-gray-200 p-6">
 
+  {activeTab === "timeslot" ? (
+    <TimeSlotDashboard />
+  ) : (
+    <>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        {activeTab === "pickup" ? "Today's Pickups" : "Today's Deliveries"}
+      </h2>
 
-       <div className="space-y-4">
-  {(activeTab === "pickup" ? pickupList : deliveryList).map((item) => (
-    <PickupCard
-      key={item.orderId}
-      orderId={item.orderId}
-      status={item.status}
-      customerName={item.customerName}
-      phone={item.phone}
-      address={item.address}
-      driver={item.driver}
-      time={item.time}
-      items={item.items}
-      showComplete={item.showComplete}
-    />
-  ))}
-</div>
-
+      <div className="space-y-4">
+        {(activeTab === "pickup" ? pickupList : deliveryList).map((item) => (
+          <PickupCard
+            key={item.orderId}
+            orderId={item.orderId}
+            status={item.status}
+            customerName={item.customerName}
+            phone={item.phone}
+            address={item.address}
+            driver={item.driver}
+            time={item.time}
+            items={item.items}
+            showComplete={item.showComplete}
+          />
+        ))}
       </div>
-    
+    </>
+  )}
+
+</div>
         
     </div>
   )

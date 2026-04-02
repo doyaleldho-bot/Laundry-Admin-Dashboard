@@ -20,15 +20,12 @@ export interface Order {
   paymentStatus: string;
   amount: number;
 }
-const ORDER_STATUSES = [
-  "SCHEDULED",
+const ORDER_STATUSES = [  
   "PICKUP",
   "WASHING",
   "DRYING",
   "IRONING",
   "OUT_FOR_DELIVERY",
-  "DELIVERED",
-  "CANCELLED",
 ];
 
 /* ---------------- COMPONENT ---------------- */

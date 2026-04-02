@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import dashboard from "../assets/dashboard.svg";
 import orders from "../assets/orders.svg";
@@ -12,31 +12,36 @@ import account from "../assets/account.svg";
 import support from "../assets/support.svg";
 import settings from "../assets/settings.svg";
 import { FiMenu, FiX } from "react-icons/fi";
+import { api } from "../api/axiosInstance";
+import { io } from "socket.io-client";
 
 type MenuItem = {
   label: string;
   path: string;
   icon: string;
+  permission: string;
 };
 
 const menuItems: MenuItem[] = [
-  { label: "Dashboard", icon: dashboard, path: "/" },
-  { label: "Orders", icon: orders, path: "/orders" },
-  { label: "Pickup & Delivery", icon: picup, path: "/pickup" },
-  { label: "Customers", icon: customers, path: "/customers" },
-  { label: "Services & Pricing", icon: services, path: "/services-pricing" },
-  { label: "Payments", icon: payments, path: "/payments" },
-  { label: "Report", icon: report, path: "/reports" },
-  { label: "Admin & Staff", icon: admin, path: "/admin-staff" },
-  { label: "Account & Session", icon: account, path: "/account-session" },
-  { label: "Support", icon: support, path: "/support" },
-  { label: "Settings", icon: settings, path: "/settings" },
+  { label: "Dashboard", icon: dashboard, path: "/", permission: "DASHBOARD" },
+  { label: "Orders", icon: orders, path: "/orders", permission: "ORDERS" },
+  { label: "Pickup & Delivery", icon: picup, path: "/pickup", permission: "PICKUP" },
+  { label: "Customers", icon: customers, path: "/customers", permission: "CUSTOMERS" },
+  // { label: "Services & Pricing", icon: services, path: "/services-pricing", permission: "SERVICES" },
+  { label: "Payments", icon: payments, path: "/payments", permission: "PAYMENTS" },
+  { label: "Report", icon: report, path: "/reports", permission: "REPORT" },
+  { label: "Admin & Staff", icon: admin, path: "/admin-staff", permission: "ADMIN_STAFF" },
+  { label: "Account & Session", icon: account, path: "/account-session", permission: "ACCOUNT_SESSION" },
+  { label: "Support", icon: support, path: "/support", permission: "SUPPORT" },
+  { label: "Settings", icon: settings, path: "/settings", permission: "SETTINGS" },
 ];
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
-const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+const socketRef = useRef<any>(null);
 
   const handleMouseEnter = (label: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -48,6 +53,43 @@ const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
       setHovered(null);
     }, 100);
   };
+
+
+
+/* FETCH FUNCTION */
+const fetchPermissions = useCallback(async () => {
+  try {
+    const res = await api.get("/permissions");
+    setUserPermissions(res.data.permissions);
+  } catch (err) {
+    console.error("Error fetching permissions:", err);
+  }
+}, []);
+
+/* INITIAL LOAD */
+useEffect(() => {
+  fetchPermissions();
+}, [fetchPermissions]);
+
+/* SOCKET REAL-TIME */
+useEffect(() => {
+  socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
+
+  socketRef.current.on("branch:update", fetchPermissions);
+
+  return () => {
+    socketRef.current?.off("branch:update", fetchPermissions);
+    socketRef.current?.disconnect();
+  };
+}, [fetchPermissions]);
+
+
+const filteredMenu =
+  userPermissions.length > 0
+    ? menuItems.filter((item) =>
+        userPermissions.includes(item.permission)
+      )
+    : [];
 
   return (
     <>
@@ -99,7 +141,7 @@ const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
           {/* MENU */}
           <nav className="mt-10 flex flex-col gap-5 pl-[42px] flex-1 overflow-y-auto pr-3 no-scrollbar">
-            {menuItems.map(({ label, icon, path }) => (
+            {filteredMenu.map(({ label, icon, path }) => (
               <NavLink key={label} to={path} onClick={() => setOpen(false)}>
                 {({ isActive }) => (
                   <div
@@ -110,10 +152,9 @@ const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
                       rounded-md text-[14px]
                       w-[294px]
                       transition-all duration-200
-                      ${
-                        isActive || hovered === label
-                          ? "w-[265px] bg-white text-[#083b9a] font-medium"
-                          : "text-white/90 hover:bg-white/30"
+                      ${isActive || hovered === label
+                        ? "w-[265px] bg-white text-[#083b9a] font-medium"
+                        : "text-white/90 hover:bg-white/30"
                       }
                     `}
                   >

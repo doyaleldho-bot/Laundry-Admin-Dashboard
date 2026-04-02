@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 let isRedirecting = false; 
 
 export const api = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
+  // baseURL: "http://localhost:5001/api",/
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -13,19 +14,45 @@ export const api = axios.create({
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401 && !isRedirecting) {
-      isRedirecting = true; 
+  async (error) => {
 
-      toast.warning("Session expired. Please login again.");
+    const originalRequest = error.config;
 
-      localStorage.removeItem("isLoggedIn");
+    if (error.response?.status === 401 && !originalRequest._retry) {
 
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
+      originalRequest._retry = true;
+
+      try {
+
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/admin/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
+
+        return api(originalRequest);
+
+      } catch (err) {
+
+        if (!isRedirecting) {
+
+          isRedirecting = true;
+
+          toast.warning("Session expired. Please login again.");
+
+          localStorage.removeItem("adm");
+
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);
+
+        }
+
+      }
+
     }
 
     return Promise.reject(error);
+
   }
 );

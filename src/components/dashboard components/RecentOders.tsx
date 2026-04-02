@@ -178,7 +178,7 @@ const RecentOrdersApi: React.FC = () => {
   useEffect(() => {
     fetchRecentOrders();
 
-    socketRef.current = io("http://localhost:5001");
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
     socketRef.current.on("dashboard:update", fetchRecentOrders);
 
     return () => {

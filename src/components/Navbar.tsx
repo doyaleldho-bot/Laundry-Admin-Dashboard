@@ -39,7 +39,8 @@ const Navbar = ({ onDateChange }: Props) => {
   const handleLogout = async () => {
     try {
       await api.post("/admin/logout"); // your logout API
-      localStorage.clear();           // remove stored tokens
+      // localStorage.clear();   
+      localStorage.removeItem('adm'); 
       window.location.href = "/login"; // redirect
     } catch (err) {
       console.error("Logout failed:", err);

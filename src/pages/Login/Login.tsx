@@ -6,10 +6,15 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../store/authStore";
 import { loginUser } from "../../slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface LoginFormInputs {
   email: string;
   password: string;
+     latitude?: number;
+    longitude?: number;
+    country?: string;
+    city?: string;
 }
 
 export default function Login() {
@@ -26,17 +31,96 @@ export default function Login() {
     },
   });
 
+// const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+//     try {
+//     if (!navigator.geolocation) {
+//       toast.error("Location is not supported by this browser");
+//       return;
+//     }
+
+//     navigator.geolocation.getCurrentPosition(
+//       async function (position) {
+//         try {
+//           const latitude = position.coords.latitude;
+//           const longitude = position.coords.longitude;
+
+//           const res = await fetch(
+//             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+//           );
+
+//           const location = await res.json();
+
+//           const country = location?.address?.country || "Unknown";
+//           const city =
+//             location?.address?.city ||
+//             location?.address?.town ||
+//             location?.address?.village ||
+//             "Unknown";
+
+//           const responseAction = await dispatch(
+//             loginUser({
+//               email: data.email,
+//               password: data.password,
+//               latitude,
+//               longitude,
+//               country,
+//               city,
+//             })
+//           );
+
+//           if (loginUser.fulfilled.match(responseAction)) {
+//             navigate("/dashboard");
+//           }
+//         } catch (err) {
+//           console.error("Location fetch error:", err);
+//           toast.error("Unable to detect location.");
+//         }
+//       },
+//       function (error) {
+//         console.log("Geolocation error:", error);
+
+//         if (error.code === 1) {
+//           toast.error("Location permission denied.");
+//         } else if (error.code === 2) {
+//           toast.error("Location unavailable.");
+//         } else if (error.code === 3) {
+//           toast.error("Location request timed out.");
+//         }
+//       },
+//       {
+//         enableHighAccuracy: true,
+//         timeout: 15000,
+//         maximumAge: 0,
+//       }
+//     );
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
 const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
   try {
-    const responseAction = await dispatch(loginUser({ email: data.email, password: data.password }));
+    const responseAction = await dispatch(
+  loginUser({
+    email: data.email,
+    password: data.password,
+    latitude: 0,
+    longitude: 0,
+    country: "",
+    city: "",
+  })
+);
+
     if (loginUser.fulfilled.match(responseAction)) {
-      navigate("/dashboard"); 
+      navigate("/dashboard");
+    } else {
+      toast.error("Login failed");
     }
   } catch (err) {
     console.error(err);
+    toast.error("Something went wrong");
   }
 };
-
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center relative"

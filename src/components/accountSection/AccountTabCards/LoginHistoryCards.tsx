@@ -12,6 +12,8 @@ export type LoginHistoryItem = {
   ip: string;
   time: string;
   status: "success" | "failed" | "logout" | "active";
+  city:string;
+  country:string;
 };
 
 
@@ -42,6 +44,8 @@ const socketRef = useRef<Socket | null>(null);
       time: formatTimeIST(item.lastActive) || "N/A",
       // dynamic status
       status: item.isActive ? "active" : "logout",
+      city: item.city || "Unknown",
+      country: item.country || "Unknown",
     }));
 
     setData(mapped);
@@ -58,7 +62,7 @@ fetchHistory();
   }, []);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5001");
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
     // Listen for dashboard updates
     const handleUpdate = () => fetchHistory();
     socketRef.current.on("session:update", handleUpdate);
@@ -99,6 +103,8 @@ fetchHistory();
                 <th className="text-left px-4 py-3">IP Address</th>
                 <th className="text-left px-4 py-3">Login Time</th>
                 <th className="text-left px-4 py-3">Status</th>
+                <th className="text-left px-4 py-3">City</th>
+                <th className="text-left px-4 py-3">Country</th>
               </tr>
             </thead>
 
@@ -147,6 +153,21 @@ fetchHistory();
                         <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
                           Active Now
                         </span>
+                      )}
+                 
+                    </td>
+                    <td>
+                           {item.city && (
+                        <div className="text-sm text-gray-600 mt-1">
+                          {item.city}
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                           {item.city && (
+                        <div className="text-sm text-gray-600 mt-1">
+                         {item.country}
+                        </div>
                       )}
                     </td>
                   </tr>

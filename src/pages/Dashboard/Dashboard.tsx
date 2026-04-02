@@ -111,6 +111,7 @@ const Dashboard = () => {
             color="blue"
             icon={<img src={today} alt="logo" className="w-12 h-12" />}
           />
+          
           <StatsCard
             title="Pending Pickups"
             value={stats?.pendingPickups || 0}
@@ -138,6 +139,7 @@ const Dashboard = () => {
             icon={<img src={ready} alt="logo" className="w-12 h-12" />}
           />
         </>
+        
 
       </div>
       <div className="flex gap-4">

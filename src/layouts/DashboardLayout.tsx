@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-
+import { Navigate } from "react-router-dom";
 
 const DashboardLayout: React.FC = () => {
 
-  const isAuthenticated = localStorage.getItem("isLoggedIn") === "true";
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const isAuthenticated = localStorage.getItem("adm") === "true";
 
   if (!isAuthenticated) {
-    window.location.href = "/login";
-    return null;
+    return <Navigate to="/login" replace />;
   }
   return (
     <div className="h-screen w-full flex bg-[#F6F5FA] overflow-hidden">
